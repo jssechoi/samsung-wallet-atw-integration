@@ -1,0 +1,17 @@
+# Profile: certs – use keys/certs from project certs/ folder (copy files into demo-spring-boot-backend/certs/ first)
+# Run: cd demo-spring-boot-backend && mvn spring-boot:run -Dspring-boot.run.profiles=certs
+
+samsung:
+  wallet:
+    partner-id: ${SAMSUNG_WALLET_PARTNER_ID:4123202943517138496}
+    card-id: ${SAMSUNG_WALLET_CARD_ID:3iulq9hr93hg0}
+    certificate-id: ${SAMSUNG_WALLET_CERTIFICATE_ID:dbR7}
+    card-id-ticket: 3iulq9hr93hg0
+    card-id-boardingpass: 3iumevlevet00
+    card-id-coupon: 3iumf1neuhjg0
+    card-id-idcard: 3iumf2sua70g0
+    # Project certs folder (relative to working directory at run time)
+    partner-private-key-path: certs/wltprtnrs.key
+    samsung-public-cert-path: certs/wlt-260223_walletsvc.samsung.com.crt
+    api-base-url: https://tsapi-card.walletsvc.samsung.com
+    cc2: us

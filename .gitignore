@@ -1,0 +1,53 @@
+# Build
+target/
+build/
+out/
+*.class
+*.jar
+*.war
+*.ear
+*.log
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+
+# Maven
+.mvn/wrapper/maven-wrapper.jar
+!**.gitkeep
+
+# Gradle
+.gradle/
+!gradle-wrapper.jar
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env / secrets (do not commit real keys)
+.env
+.env.local
+*.p12
+*.jks
+!**/src/test/resources/**/*.p12
+!**/src/test/resources/**/*.jks
+application-local.yml
+application-*.local.yml
+*-local.properties
+# Test certs/keys (exclude certs folder contents from repo)
+demo-spring-boot-backend/certs/*.key
+demo-spring-boot-backend/certs/*.crt
+demo-spring-boot-backend/certs/*.pem
+!demo-spring-boot-backend/certs/README.md
+
+# Logs
+logs/
+*.log
+
+# H2 (optional: ignore DB files if you want)
+# *.db
+# *.trace.db

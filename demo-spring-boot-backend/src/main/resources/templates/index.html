@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Samsung Wallet ATW Demo</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+        h1 { font-size: 1.5rem; }
+        h2 { font-size: 1.2rem; margin: 1.5rem 0 0.5rem 0; color: #333; }
+        .card-section { margin-bottom: 2rem; }
+        .card { border: 1px solid #ddd; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; }
+        .card h3 { margin: 0 0 0.5rem 0; font-size: 1.1rem; }
+        .meta { color: #666; font-size: 0.9rem; }
+        .actions { margin-top: 0.75rem; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        button { padding: 0.5rem 0.75rem; border-radius: 6px; border: 1px solid #333; background: #fff; cursor: pointer; font-size: 0.9rem; }
+        button.primary { background: #1428a0; color: #fff; border-color: #1428a0; }
+        button:disabled { opacity: 0.6; cursor: not-allowed; }
+        .atw-btn-wrap { display: inline-flex; flex-direction: column; align-items: center; gap: 0.25rem; }
+        .atw-btn-wrap .atw-btn-label { font-size: 0.75rem; color: #555; font-weight: 500; }
+        .atw-btn-img { padding: 0; border: none; background: none; cursor: pointer; display: inline-block; }
+        .atw-btn-img img { display: block; height: 40px; width: auto; }
+        .atw-btn-img:disabled img { opacity: 0.6; }
+        .error { color: #c00; font-size: 0.85rem; margin-top: 0.25rem; }
+        .success { color: #080; }
+        .qr-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .qr-modal.show { display: flex; }
+        .qr-modal-content { background: #fff; padding: 1.5rem; border-radius: 8px; max-width: 320px; text-align: center; }
+        .qr-modal-content #qr-container { margin: 1rem 0; min-height: 180px; display: flex; align-items: center; justify-content: center; }
+        .qr-modal-content #qr-container canvas { max-width: 100%; }
+        .qr-modal-content #qr-fallback-msg { display: none; margin: 1rem 0; padding: 0.75rem; background: #f5f5f5; border-radius: 6px; font-size: 0.9rem; color: #333; text-align: left; }
+        .qr-modal-close { margin-top: 0.75rem; padding: 0.5rem 1rem; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Samsung Wallet ATW Demo</h1>
+    <p>Add <strong>Event Tickets</strong>, <strong>Boarding Passes</strong>, <strong>Coupons</strong>, or <strong>Digital IDs</strong> to Samsung Wallet. Use <strong>Add to Wallet (Transit)</strong> or <strong>Add to Wallet (Fetch)</strong>. <strong>Update Notification</strong> triggers a refresh in the wallet.</p>
+
+    <!-- Event Tickets -->
+    <section class="card-section">
+        <h2>Event Tickets</h2>
+        <div th:each="ticket : ${tickets}" class="card wallet-card" th:data-ref-id="${ticket.refId}" data-card-type="ticket">
+            <h3 th:text="${ticket.title}">Event</h3>
+            <div class="meta">
+                <span th:text="${ticket.venue}">Venue</span>
+                <span th:if="${ticket.gate}"> · Gate <span th:text="${ticket.gate}"></span></span>
+                <span> · Ref: <code th:text="${ticket.refId}"></code></span>
+            </div>
+            <div class="actions">
+                <span class="atw-btn-wrap">
+                    <button type="button" class="atw-btn-img atw-transit" th:data-ref-id="${ticket.refId}" th:data-card-id="${ticketCardId}" data-card-type="ticket" title="Add to Wallet (Transit)"><img src="https://us-cdn-gpp.mcsvc.samsung.com/lib/v2/add-to-samsung-wallet_en-us.png" alt="Add to Samsung Wallet (Transit)"/></button>
+                    <span class="atw-btn-label">Transit</span>
+                </span>
+                <span class="atw-btn-wrap">
+                    <button type="button" class="atw-btn-img atw-fetch" th:data-ref-id="${ticket.refId}" th:data-card-id="${ticketCardId}" data-card-type="ticket" title="Add to Wallet (Fetch)"><img src="https://us-cdn-gpp.mcsvc.samsung.com/lib/v2/add-to-samsung-wallet_en-us.png" alt="Add to Samsung Wallet (Fetch)"/></button>
+                    <span class="atw-btn-label">Fetch</span>
+                </span>
+                <button type="button" class="atw-update" th:data-ref-id="${ticket.refId}" data-card-type="ticket">Update Notification</button>
+            </div>
+            <div class="error" role="alert" aria-live="polite"></div>
+        </div>
+    </section>
+
+    <!-- Boarding Passes -->
+    <section class="card-section">
+        <h2>Boarding Passes</h2>
+        <div th:each="bp : ${boardingPasses}" class="card wallet-card" th:data-ref-id="${bp.refId}" data-card-type="boardingpass">
+            <h3 th:text="${bp.title}">Boarding Pass</h3>
+            <div class="meta">
+                <span th:text="${bp.providerName}">Provider</span>
+                <span th:if="${bp.vehicleNumber}"> · <span th:text="${bp.vehicleNumber}"></span></span>
+                <span th:if="${bp.departCode}"> · <span th:text="${bp.departCode}"></span> → <span th:text="${bp.arriveCode}"></span></span>
+                <span> · Ref: <code th:text="${bp.refId}"></code></span>
+            </div>
+            <div class="actions">
+                <span class="atw-btn-wrap">
+                    <button type="button" class="atw-btn-img atw-transit" th:data-ref-id="${bp.refId}" th:data-card-id="${boardingPassCardId}" data-card-type="boardingpass" title="Add to Wallet (Transit)"><img src="https://us-cdn-gpp.mcsvc.samsung.com/lib/v2/add-to-samsung-wallet_en-us.png" alt="Add to Samsung Wallet (Transit)"/></button>
+                    <span class="atw-btn-label">Transit</span>
+                </span>
+                <span class="atw-btn-wrap">
+                    <button type="button" class="atw-btn-img atw-fetch" th:data-ref-id="${bp.refId}" th:data-card-id="${boardingPassCardId}" data-card-type="boardingpass" title="Add to Wallet (Fetch)"><img src="https://us-cdn-gpp.mcsvc.samsung.com/lib/v2/add-to-samsung-wallet_en-us.png" alt="Add to Samsung Wallet (Fetch)"/></button>
+                    <span class="atw-btn-label">Fetch</span>
+                </span>
+                <button type="button" class="atw-update" th:data-ref-id="${bp.refId}" data-card-type="boardingpass">Update Notification</button>
+            </div>
+            <div class="error" role="alert" aria-live="polite"></div>
+        </div>
+    </section>
+
+    <!-- Coupons -->
+    <section class="card-section">
+        <h2>Coupons</h2>
+        <div th:each="coupon : ${coupons}" class="card wallet-card" th:data-ref-id="${coupon.refId}" data-card-type="coupon">
+            <h3 th:text="${coupon.title}">Coupon</h3>
+            <div class="meta">
+                <span th:if="${coupon.brandName}" th:text="${coupon.brandName}">Brand</span>
+                <span> · Ref: <code th:text="${coupon.refId}"></code></span>
+            </div>
+            <div class="actions">
+                <span class="atw-btn-wrap">
+                    <button type="button" class="atw-btn-img atw-transit" th:data-ref-id="${coupon.refId}" th:data-card-id="${couponCardId}" data-card-type="coupon" title="Add to Wallet (Transit)"><img src="https://us-cdn-gpp.mcsvc.samsung.com/lib/v2/add-to-samsung-wallet_en-us.png" alt="Add to Samsung Wallet (Transit)"/></button>
+                    <span class="atw-btn-label">Transit</span>
+                </span>
+                <span class="atw-btn-wrap">
+                    <button type="button" class="atw-btn-img atw-fetch" th:data-ref-id="${coupon.refId}" th:data-card-id="${couponCardId}" data-card-type="coupon" title="Add to Wallet (Fetch)"><img src="https://us-cdn-gpp.mcsvc.samsung.com/lib/v2/add-to-samsung-wallet_en-us.png" alt="Add to Samsung Wallet (Fetch)"/></button>
+                    <span class="atw-btn-label">Fetch</span>
+                </span>
+                <button type="button" class="atw-update" th:data-ref-id="${coupon.refId}" data-card-type="coupon">Update Notification</button>
+            </div>
+            <div class="error" role="alert" aria-live="polite"></div>
+        </div>
+    </section>
+
+    <!-- Digital IDs -->
+    <section class="card-section">
+        <h2>Digital IDs</h2>
+        <div th:each="idCard : ${idCards}" class="card wallet-card" th:data-ref-id="${idCard.refId}" data-card-type="idcard">
+            <h3 th:text="${idCard.title}">ID Card</h3>
+            <div class="meta">
+                <span th:text="${idCard.holderName}">Holder</span>
+                <span th:if="${idCard.organization}"> · <span th:text="${idCard.organization}"></span></span>
+                <span> · Ref: <code th:text="${idCard.refId}"></code></span>
+            </div>
+            <div class="actions">
+                <span class="atw-btn-wrap">
+                    <button type="button" class="atw-btn-img atw-transit" th:data-ref-id="${idCard.refId}" th:data-card-id="${idCardCardId}" data-card-type="idcard" title="Add to Wallet (Transit)"><img src="https://us-cdn-gpp.mcsvc.samsung.com/lib/v2/add-to-samsung-wallet_en-us.png" alt="Add to Samsung Wallet (Transit)"/></button>
+                    <span class="atw-btn-label">Transit</span>
+                </span>
+                <span class="atw-btn-wrap">
+                    <button type="button" class="atw-btn-img atw-fetch" th:data-ref-id="${idCard.refId}" th:data-card-id="${idCardCardId}" data-card-type="idcard" title="Add to Wallet (Fetch)"><img src="https://us-cdn-gpp.mcsvc.samsung.com/lib/v2/add-to-samsung-wallet_en-us.png" alt="Add to Samsung Wallet (Fetch)"/></button>
+                    <span class="atw-btn-label">Fetch</span>
+                </span>
+                <button type="button" class="atw-update" th:data-ref-id="${idCard.refId}" data-card-type="idcard">Update Notification</button>
+            </div>
+            <div class="error" role="alert" aria-live="polite"></div>
+        </div>
+    </section>
+
+    <div id="qr-modal" class="qr-modal" aria-hidden="true">
+        <div class="qr-modal-content">
+            <p id="qr-modal-title">Scan with your phone to add to Samsung Wallet</p>
+            <div id="qr-container"></div>
+            <div id="qr-fallback-msg"></div>
+            <button type="button" class="qr-modal-close" id="qr-modal-close">Close</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script th:inline="javascript">
+        const ATW_BASE = 'https://a.swallet.link';
+        const CERTIFICATE_ID = /*[[${certificateId}]]*/ 'demo-cert';
+        // Transit: https://a.swallet.link/atw/v3/{cardId}#Clip?cdata={cdata}
+        function atwTransitUrl(cardId) { return ATW_BASE + '/atw/v3/' + cardId + '#Clip'; }
+        // Fetch: https://a.swallet.link/atw/v3/{certificateId}/{cardId}#Clip?pdata={pdata}
+        function atwFetchUrl(cardId) { return ATW_BASE + '/atw/v3/' + CERTIFICATE_ID + '/' + cardId + '#Clip'; }
+        // Redirect to wallet only on Samsung Galaxy (Android with Samsung/Galaxy in UA); all others see QR
+        var isAndroid = /Android/i.test(navigator.userAgent);
+        var isSamsungGalaxy = isAndroid && /Samsung|SM-|Galaxy|SAMSUNG/i.test(navigator.userAgent);
+        var useRedirectToWallet = isSamsungGalaxy;
+        var MAX_QR_URL_LENGTH = 1600;
+        function showQrModal(url) {
+            var modal = document.getElementById('qr-modal');
+            var container = document.getElementById('qr-container');
+            var fallback = document.getElementById('qr-fallback-msg');
+            var title = document.getElementById('qr-modal-title');
+            container.innerHTML = '';
+            container.style.display = '';
+            fallback.style.display = 'none';
+            fallback.textContent = '';
+            title.textContent = 'Scan with your phone to add to Samsung Wallet';
+            if (!url || url.length > MAX_QR_URL_LENGTH) {
+                var demoPageUrl = window.location.href;
+                fallback.innerHTML = 'The Add to Wallet (Transit) link is too long to show as a QR code.<br><br><strong>Scan the QR code below</strong> to open this demo page on your mobile device, then tap <strong>Add to Wallet (Transit)</strong> there. Or use the <strong>Fetch</strong> option and scan its QR from this screen.';
+                fallback.style.display = 'block';
+                try {
+                    new QRCode(container, { text: demoPageUrl, width: 200, height: 200 });
+                } catch (e) {
+                    fallback.innerHTML += '<br><br><a href="' + demoPageUrl + '" target="_blank" rel="noopener">Open demo page</a>';
+                }
+                modal.classList.add('show');
+                return;
+            }
+            try {
+                new QRCode(container, { text: url, width: 200, height: 200 });
+                modal.classList.add('show');
+            } catch (e) {
+                container.style.display = 'none';
+                fallback.textContent = 'Could not generate QR code. Please use a Samsung Galaxy device or try the Fetch option.';
+                fallback.style.display = 'block';
+                modal.classList.add('show');
+            }
+        }
+        document.getElementById('qr-modal-close').addEventListener('click', function() {
+            document.getElementById('qr-modal').classList.remove('show');
+        });
+        document.getElementById('qr-modal').addEventListener('click', function(e) {
+            if (e.target === this) this.classList.remove('show');
+        });
+    </script>
+    <script>
+        document.querySelectorAll('.atw-transit').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const refId = this.getAttribute('data-ref-id');
+                const type = this.getAttribute('data-card-type') || 'ticket';
+                const cardId = this.getAttribute('data-card-id');
+                const errEl = this.closest('.card').querySelector('.error');
+                errEl.textContent = '';
+                errEl.classList.remove('success');
+                btn.disabled = true;
+                fetch('/api/v1/wallet/transit-data?refId=' + encodeURIComponent(refId) + '&type=' + encodeURIComponent(type))
+                    .then(function(r) {
+                        if (!r.ok) throw new Error(r.status + ' ' + r.statusText);
+                        return r.json();
+                    })
+                    .then(function(data) {
+                        if (!data || data.cdata == null) {
+                            errEl.textContent = 'Error: No card data received.';
+                            return;
+                        }
+                        const url = atwTransitUrl(cardId) + '?cdata=' + encodeURIComponent(data.cdata);
+                        if (useRedirectToWallet) window.location.href = url; else showQrModal(url);
+                    })
+                    .catch(function(e) {
+                        errEl.textContent = 'Error: ' + e.message;
+                    })
+                    .finally(function() { btn.disabled = false; });
+            });
+        });
+
+        document.querySelectorAll('.atw-fetch').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const refId = this.getAttribute('data-ref-id');
+                const type = this.getAttribute('data-card-type') || 'ticket';
+                const cardId = this.getAttribute('data-card-id');
+                const errEl = this.closest('.card').querySelector('.error');
+                errEl.textContent = '';
+                errEl.classList.remove('success');
+                btn.disabled = true;
+                fetch('/api/v1/wallet/fetch-data?refId=' + encodeURIComponent(refId) + '&type=' + encodeURIComponent(type))
+                    .then(function(r) {
+                        if (!r.ok) throw new Error(r.status + ' ' + r.statusText);
+                        return r.json();
+                    })
+                    .then(function(data) {
+                        const url = atwFetchUrl(cardId) + '?pdata=' + encodeURIComponent(data.pdata);
+                        if (useRedirectToWallet) window.location.href = url; else showQrModal(url);
+                    })
+                    .catch(function(e) {
+                        errEl.textContent = 'Error: ' + e.message;
+                    })
+                    .finally(function() { btn.disabled = false; });
+            });
+        });
+
+        document.querySelectorAll('.atw-update').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const refId = this.getAttribute('data-ref-id');
+                const cardType = this.getAttribute('data-card-type') || 'ticket';
+                const errEl = this.closest('.card').querySelector('.error');
+                errEl.textContent = '';
+                errEl.classList.remove('success');
+                btn.disabled = true;
+                fetch('/api/v1/wallet/update-notification', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ refId: refId, state: 'UPDATED', cardType: cardType })
+                })
+                    .then(function(r) {
+                        if (!r.ok) throw new Error(r.status + ' ' + r.statusText);
+                        return r.json();
+                    })
+                    .then(function(data) {
+                        errEl.textContent = 'Notification sent (status ' + data.status + ').';
+                        errEl.classList.add('success');
+                    })
+                    .catch(function(e) {
+                        errEl.textContent = 'Error: ' + e.message;
+                    })
+                    .finally(function() { btn.disabled = false; });
+            });
+        });
+    </script>
+</body>
+</html>

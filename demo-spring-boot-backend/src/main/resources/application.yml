@@ -1,0 +1,40 @@
+server:
+  port: 48080
+  # Listen on all interfaces so mobile devices on the same network can access (e.g. http://<your-pc-ip>:48080)
+  address: 0.0.0.0
+
+spring:
+  application:
+    name: samsung-wallet-atw-demo
+  datasource:
+    url: jdbc:h2:mem:wallet;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
+
+# Samsung Wallet (optional – leave empty for in-memory demo keys)
+samsung:
+  wallet:
+    partner-id: demo-partner
+    card-id: demo-card
+    certificate-id: demo-cert
+    # Card IDs per type (for ATW links and Update Notification)
+    card-id-ticket: 3iulq9hr93hg0
+    card-id-boardingpass: 3iumevlevet00
+    card-id-coupon: 3iumf1neuhjg0
+    card-id-idcard: 3iumf2sua70g0
+    # partner-private-key-path: /path/to/partner-private.pem
+    # samsung-public-cert-path: /path/to/samsung-public.crt
+    api-base-url: https://tsapi-card.walletsvc.samsung.com
+    cc2: us
