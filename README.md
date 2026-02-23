@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Samsung Wallet ATW Integration
 
 Open-source reference implementation for integrating **Add to Samsung Wallet (ATW)** with partner backends and clients. Enables partners who manage tickets (or other pass types) to issue them into Samsung Wallet from web and Android with minimal crypto and API boilerplate.
@@ -150,3 +151,7 @@ Sample data can be edited in `demo-spring-boot-backend/src/main/resources/data.s
 ## License
 
 See [LICENSE](LICENSE) in the repository root (add a license file as needed for your project).
+=======
+# samsung-wallet-atw-integration
+A framework-agnostic Java library and Spring Boot demo for integrating Samsung Wallet Add-to-Wallet (ATW) features.
+>>>>>>> 3d457ea601e88eccff7353a5e39cdbe4b0918d3a
