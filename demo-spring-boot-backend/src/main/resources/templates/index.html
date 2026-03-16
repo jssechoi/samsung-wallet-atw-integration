@@ -149,6 +149,7 @@
     <script th:inline="javascript">
         const ATW_BASE = 'https://a.swallet.link';
         const CERTIFICATE_ID = /*[[${certificateId}]]*/ 'demo-cert';
+        const NGROK_BASE_URL = /*[[${ngrokBaseUrl}]]*/ '';
         // Transit: https://a.swallet.link/atw/v3/{cardId}#Clip?cdata={cdata}
         function atwTransitUrl(cardId) { return ATW_BASE + '/atw/v3/' + cardId + '#Clip'; }
         // Fetch: https://a.swallet.link/atw/v3/{certificateId}/{cardId}#Clip?pdata={pdata}
@@ -170,6 +171,9 @@
             title.textContent = 'Scan with your phone to add to Samsung Wallet';
             if (!url || url.length > MAX_QR_URL_LENGTH) {
                 var demoPageUrl = window.location.href;
+                if (NGROK_BASE_URL && demoPageUrl.indexOf('localhost') !== -1) {
+                    demoPageUrl = NGROK_BASE_URL;
+                }
                 fallback.innerHTML = 'The Add to Wallet (Transit) link is too long to show as a QR code.<br><br><strong>Scan the QR code below</strong> to open this demo page on your mobile device, then tap <strong>Add to Wallet (Transit)</strong> there. Or use the <strong>Fetch</strong> option and scan its QR from this screen.';
                 fallback.style.display = 'block';
                 try {

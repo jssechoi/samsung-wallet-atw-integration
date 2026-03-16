@@ -23,6 +23,9 @@ spring:
     init:
       mode: always
 
+demo:
+  ngrok-base-url: https://e64f-125-179-40-131.ngrok-free.app/
+
 # Samsung Wallet (optional – leave empty for in-memory demo keys)
 samsung:
   wallet:

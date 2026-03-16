@@ -46,6 +46,9 @@ public class WalletDemoController {
     @Value("${samsung.wallet.card-id-idcard:3iumf2sua70g0}")
     private String idCardCardId;
 
+    @Value("${demo.ngrok-base-url:}")
+    private String ngrokBaseUrl;
+
     public WalletDemoController(TicketService ticketService,
                                BoardingPassService boardingPassService,
                                CouponService couponService,
@@ -73,6 +76,7 @@ public class WalletDemoController {
         model.addAttribute("boardingPassCardId", boardingPassCardId);
         model.addAttribute("couponCardId", couponCardId);
         model.addAttribute("idCardCardId", idCardCardId);
+        model.addAttribute("ngrokBaseUrl", ngrokBaseUrl);
         return "index";
     }
 
