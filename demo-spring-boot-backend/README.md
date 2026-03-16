@@ -17,6 +17,17 @@ cd demo-spring-boot-backend
 
 Open [http://localhost:48080](http://localhost:48080).
 
+## Run with Docker
+
+From the **repository root** (where the `Dockerfile` lives):
+
+```bash
+docker build -t samsung-wallet-demo .
+docker run -p 48080:48080 samsung-wallet-demo
+```
+
+Then open [http://localhost:48080](http://localhost:48080). The app uses `server.port=${PORT:48080}`, so on [Render](https://render.com) (or any host that sets `PORT`) the correct port is picked automatically. For Render: create a **Web Service**, connect this repo, set **Environment** to **Docker**, and deploy; no build/start commands needed.
+
 ## Test keys/certificates (Partner Test)
 
 To test with real partner key and Samsung certificate, use one of the following.
