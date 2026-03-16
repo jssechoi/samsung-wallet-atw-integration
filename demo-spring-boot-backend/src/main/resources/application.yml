@@ -1,5 +1,5 @@
 server:
-  port: 48080
+  port: ${PORT:48080}
   # Listen on all interfaces so mobile devices on the same network can access (e.g. http://<your-pc-ip>:48080)
   address: 0.0.0.0
 
@@ -29,9 +29,11 @@ demo:
 # Samsung Wallet (optional – leave empty for in-memory demo keys)
 samsung:
   wallet:
-    partner-id: demo-partner
-    card-id: demo-card
-    certificate-id: demo-cert
+    # Demo default; for production set env var SAMSUNG_WALLET_PARTNER_ID
+    partner-id: ${SAMSUNG_WALLET_PARTNER_ID:4123202943517138496}
+    card-id: ${SAMSUNG_WALLET_CARD_ID:demo-card}
+    # Demo default; for production set env var SAMSUNG_WALLET_CERTIFICATE_ID (certificateId is case-sensitive, default: dbR7)
+    certificate-id: ${SAMSUNG_WALLET_CERTIFICATE_ID:dbR7}
     # Card IDs per type (for ATW links and Update Notification)
     card-id-ticket: 3iulq9hr93hg0
     card-id-boardingpass: 3iumevlevet00

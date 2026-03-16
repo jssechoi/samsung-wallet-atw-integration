@@ -10,8 +10,8 @@ samsung:
     card-id-boardingpass: 3iumevlevet00
     card-id-coupon: 3iumf1neuhjg0
     card-id-idcard: 3iumf2sua70g0
-    # Project certs folder (relative to working directory at run time)
-    partner-private-key-path: certs/wltprtnrs.key
-    samsung-public-cert-path: certs/wlt-260223_walletsvc.samsung.com.crt
+    # Paths relative to project root (for testing)
+    partner-private-key-path: demo-spring-boot-backend/src/main/resources/certs/dbR7/wltprtnrs.key
+    samsung-public-cert-path: demo-spring-boot-backend/src/main/resources/certs/dbR7/wlt-260223_walletsvc.samsung.com.crt
     api-base-url: https://tsapi-card.walletsvc.samsung.com
     cc2: us

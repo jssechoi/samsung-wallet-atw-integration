@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Samsung Wallet ATW Integration
 
 Open-source reference implementation for integrating **Add to Samsung Wallet (ATW)** with partner backends and clients. Enables partners who manage tickets (or other pass types) to issue them into Samsung Wallet from web and Android with minimal crypto and API boilerplate.
@@ -14,6 +13,7 @@ Open-source reference implementation for integrating **Add to Samsung Wallet (AT
 ```
 samsung-wallet-atw-integration/
 ├── README.md                    # This file
+├── Dockerfile                   # Multi-stage build for demo-spring-boot-backend (Render / Docker)
 ├── core-crypto/                 # [Phase 1] Pure Java JWS/JWE & auth (no framework)
 │   └── KeyStoreLoader, WalletCryptoConfig, WalletCryptoUtil, AuthTokenValidator
 ├── demo-spring-boot-backend/    # [Phase 1] Spring Boot API + Thymeleaf web demo
@@ -148,10 +148,22 @@ Sample data can be edited in `demo-spring-boot-backend/src/main/resources/data.s
 - [REST API Authorization Token (JWT/JWS)](https://developer.samsung.com/wallet/securityauthentication/restapiauthorizationtoken.html)
 - [Card Data Token (cdata) – JWS-wrapped JWE](https://developer.samsung.com/wallet/securityauthentication/carddatatoken.html)
 
+## Running with Docker (e.g. Render)
+
+The repo includes a **multi-stage Dockerfile** at the root that builds and runs only the `demo-spring-boot-backend` module. Use it for local Docker runs or cloud deployment (e.g. [Render](https://render.com)).
+
+- **Build** (from repository root):
+  ```bash
+  docker build -t samsung-wallet-demo .
+  ```
+- **Run** (app listens on port 48080 by default; override with `PORT` env for Render):
+  ```bash
+  docker run -p 48080:48080 samsung-wallet-demo
+  ```
+- Open [http://localhost:48080](http://localhost:48080). The server uses `server.port=${PORT:48080}`, so on Render the injected `PORT` is used automatically.
+
+See [demo-spring-boot-backend/README.md](demo-spring-boot-backend/README.md) for Docker details and Render deployment steps.
+
 ## License
 
 See [LICENSE](LICENSE) in the repository root (add a license file as needed for your project).
-=======
-# samsung-wallet-atw-integration
-A framework-agnostic Java library and Spring Boot demo for integrating Samsung Wallet Add-to-Wallet (ATW) features.
->>>>>>> 3d457ea601e88eccff7353a5e39cdbe4b0918d3a
