@@ -7,6 +7,8 @@ import com.nimbusds.jwt.SignedJWT;
 
 import java.security.interfaces.RSAPublicKey;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Validates the Authorization Bearer token sent by Samsung when calling partner endpoints
@@ -15,6 +17,7 @@ import java.util.Map;
  */
 public final class AuthTokenValidator {
 
+    private static final Logger log = Logger.getLogger(AuthTokenValidator.class.getName());
     private final WalletCryptoConfig config;
 
     public AuthTokenValidator(WalletCryptoConfig config) {
@@ -46,12 +49,16 @@ public final class AuthTokenValidator {
                 ? bearerToken.substring(7).trim()
                 : bearerToken;
         if (token == null || token.isEmpty()) {
+            log.warning(String.format("Authorization validation failed: missing_token method=%s path=%s",
+                    requestMethod, requestPath));
             return false;
         }
         try {
             SignedJWT signedJwt = SignedJWT.parse(token);
             JWSVerifier verifier = new RSASSAVerifier((RSAPublicKey) config.getSamsungPublicKey());
             if (!signedJwt.verify(verifier)) {
+                log.warning(String.format("Authorization validation failed: signature_mismatch method=%s path=%s",
+                        requestMethod, requestPath));
                 return false;
             }
             JWTClaimsSet claims = signedJwt.getJWTClaimsSet();
@@ -61,14 +68,23 @@ public final class AuthTokenValidator {
                 String method = api.get("method");
                 String path = api.get("path");
                 if (method != null && !method.equalsIgnoreCase(requestMethod)) {
+                    log.warning(String.format(
+                            "Authorization validation failed: method_mismatch tokenMethod=%s requestMethod=%s requestPath=%s",
+                            method, requestMethod, requestPath));
                     return false;
                 }
                 if (path != null && !path.equals(requestPath)) {
+                    log.warning(String.format(
+                            "Authorization validation failed: path_mismatch tokenPath=%s requestPath=%s requestMethod=%s",
+                            path, requestPath, requestMethod));
                     return false;
                 }
             }
             return true;
         } catch (Exception e) {
+            log.log(Level.SEVERE, String.format(
+                    "Authorization validation failed: parse_or_verify_exception method=%s path=%s message=%s",
+                    requestMethod, requestPath, e.getMessage()), e);
             return false;
         }
     }
