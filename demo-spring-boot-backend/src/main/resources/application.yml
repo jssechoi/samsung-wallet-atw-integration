@@ -2,6 +2,8 @@ server:
   port: ${PORT:48080}
   # Listen on all interfaces so mobile devices on the same network can access (e.g. http://<your-pc-ip>:48080)
   address: 0.0.0.0
+  # Trust X-Forwarded-* headers from Render (and other reverse proxies)
+  forward-headers-strategy: framework
 
 spring:
   application:
@@ -15,6 +17,7 @@ spring:
     console:
       enabled: true
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: create-drop
     show-sql: false
@@ -23,8 +26,9 @@ spring:
     init:
       mode: always
 
+# Optional: base URL of this demo (for QR fallback when on localhost use ngrok URL; on Render set DEMO_BASE_URL to e.g. https://samsung-wallet-atw-demo.onrender.com).
 demo:
-  ngrok-base-url: https://e64f-125-179-40-131.ngrok-free.app/
+  ngrok-base-url: ${DEMO_BASE_URL:}
 
 # Samsung Wallet (optional – leave empty for in-memory demo keys)
 samsung:

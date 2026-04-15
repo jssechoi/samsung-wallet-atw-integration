@@ -34,7 +34,7 @@
 </head>
 <body>
     <h1>Samsung Wallet ATW Demo</h1>
-    <p>Add <strong>Event Tickets</strong>, <strong>Boarding Passes</strong>, <strong>Coupons</strong>, or <strong>Digital IDs</strong> to Samsung Wallet. Use <strong>Add to Wallet (Transit)</strong> or <strong>Add to Wallet (Fetch)</strong>. <strong>Update Notification</strong> triggers a refresh in the wallet.</p>
+    <p>Add <strong>Event Tickets</strong>, <strong>Boarding Passes</strong>, or <strong>Coupons</strong> to Samsung Wallet. Use <strong>Add to Wallet (Transit)</strong> or <strong>Add to Wallet (Fetch)</strong>. <strong>Update Notification</strong> triggers a refresh in the wallet.</p>
 
     <!-- Event Tickets -->
     <section class="card-section">
@@ -106,31 +106,6 @@
                     <span class="atw-btn-label">Fetch</span>
                 </span>
                 <button type="button" class="atw-update" th:data-ref-id="${coupon.refId}" data-card-type="coupon">Update Notification</button>
-            </div>
-            <div class="error" role="alert" aria-live="polite"></div>
-        </div>
-    </section>
-
-    <!-- Digital IDs -->
-    <section class="card-section">
-        <h2>Digital IDs</h2>
-        <div th:each="idCard : ${idCards}" class="card wallet-card" th:data-ref-id="${idCard.refId}" data-card-type="idcard">
-            <h3 th:text="${idCard.title}">ID Card</h3>
-            <div class="meta">
-                <span th:text="${idCard.holderName}">Holder</span>
-                <span th:if="${idCard.organization}"> · <span th:text="${idCard.organization}"></span></span>
-                <span> · Ref: <code th:text="${idCard.refId}"></code></span>
-            </div>
-            <div class="actions">
-                <span class="atw-btn-wrap">
-                    <button type="button" class="atw-btn-img atw-transit" th:data-ref-id="${idCard.refId}" th:data-card-id="${idCardCardId}" data-card-type="idcard" title="Add to Wallet (Transit)"><img src="https://us-cdn-gpp.mcsvc.samsung.com/lib/v2/add-to-samsung-wallet_en-us.png" alt="Add to Samsung Wallet (Transit)"/></button>
-                    <span class="atw-btn-label">Transit</span>
-                </span>
-                <span class="atw-btn-wrap">
-                    <button type="button" class="atw-btn-img atw-fetch" th:data-ref-id="${idCard.refId}" th:data-card-id="${idCardCardId}" data-card-type="idcard" title="Add to Wallet (Fetch)"><img src="https://us-cdn-gpp.mcsvc.samsung.com/lib/v2/add-to-samsung-wallet_en-us.png" alt="Add to Samsung Wallet (Fetch)"/></button>
-                    <span class="atw-btn-label">Fetch</span>
-                </span>
-                <button type="button" class="atw-update" th:data-ref-id="${idCard.refId}" data-card-type="idcard">Update Notification</button>
             </div>
             <div class="error" role="alert" aria-live="polite"></div>
         </div>

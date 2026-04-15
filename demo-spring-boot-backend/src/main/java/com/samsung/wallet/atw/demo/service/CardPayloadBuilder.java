@@ -32,9 +32,11 @@ public final class CardPayloadBuilder {
     private static final String DEMO_BG_IMG = "https://developer.samsung.com/static/images/wallet-demo-bg.png";
 
     public static String toCardPayloadJson(Ticket ticket) throws JsonProcessingException {
+        ObjectNode root = MAPPER.createObjectNode();
         ObjectNode card = MAPPER.createObjectNode();
+        root.set("card", card);
         card.put("type", "ticket");
-        card.put("subType", "entrances");
+        card.put("subType", "sports");
 
         ArrayNode data = MAPPER.createArrayNode();
         ObjectNode item = MAPPER.createObjectNode();
@@ -52,11 +54,10 @@ public final class CardPayloadBuilder {
         // Required: mainImg (URL, max 512kB)
         attrs.put("mainImg", DEMO_MAIN_IMG);
 
-        // Required: logoImage – darkUrl and lightUrl
-        ObjectNode logoImage = MAPPER.createObjectNode();
-        logoImage.put("darkUrl", DEMO_LOGO_DARK);
-        logoImage.put("lightUrl", DEMO_LOGO_LIGHT);
-        attrs.set("logoImage", logoImage);
+        // Spec sample supports both flat logoImage and light/dark explicit keys.
+        attrs.put("logoImage", DEMO_LOGO_DARK);
+        attrs.put("logoImage.darkUrl", DEMO_LOGO_DARK);
+        attrs.put("logoImage.lightUrl", DEMO_LOGO_LIGHT);
 
         // Required: providerName (String 32)
         attrs.put("providerName", truncate(ticket.getProviderName() != null ? ticket.getProviderName() : DEFAULT_PROVIDER_NAME, 32));
@@ -72,6 +73,8 @@ public final class CardPayloadBuilder {
         // Required: startDate (epoch ms)
         long startMs = ticket.getEventAt() != null ? ticket.getEventAt().toEpochMilli() : ticket.getCreatedAt().toEpochMilli();
         attrs.put("startDate", startMs);
+        attrs.put("category", "Sports");
+        attrs.put("eventId", "event-01");
 
         // Optional: endDate (epoch ms; if null, card expires 10h after startDate per spec)
         if (ticket.getEventAt() != null) {
@@ -105,11 +108,24 @@ public final class CardPayloadBuilder {
         }
         if (ticket.getHolderName() != null && !ticket.getHolderName().isBlank()) {
             attrs.put("holderName", truncate(ticket.getHolderName(), 64));
+            attrs.put("user", truncate(ticket.getHolderName(), 64));
+            attrs.put("certification", truncate(ticket.getHolderName(), 64));
         }
         if (ticket.getGrade() != null && !ticket.getGrade().isBlank()) {
             attrs.put("grade", truncate(ticket.getGrade(), 32));
         }
+        attrs.put("seatClass", "Standard");
+        attrs.put("seatNumber", "A-81");
+        attrs.put("reactivatableYn", "N");
+        attrs.put("preventCaptureYn", "N");
+        attrs.put("noNetworkSupportYn", "N");
+        attrs.put("person1", "{\"person\":[{\"category\":\"Adult\",\"count\":1}]}");
+        attrs.put("locations", "[{\"name\":\"Lions Ballpark\",\"address\":\"129 Samsung-ro Yeongtong-gu Suwon-si\",\"lat\":37.255993,\"lng\":127.051112}]");
+        attrs.put("groupInfo1", "Adult 1");
+        attrs.put("groupInfo2", "Standard");
+        attrs.put("groupInfo3", "Family");
         attrs.put("csInfo", DEFAULT_CS_INFO_FULL);
+        attrs.put("privacyModeYn", "N");
         attrs.put("bgColor", "#E86D1F");
         attrs.put("fontColor", "light");
         attrs.put("blinkColor", "#E86D1F");
@@ -119,7 +135,7 @@ public final class CardPayloadBuilder {
         data.add(item);
         card.set("data", data);
 
-        return MAPPER.writeValueAsString(card);
+        return MAPPER.writeValueAsString(root);
     }
 
     /**
@@ -127,7 +143,9 @@ public final class CardPayloadBuilder {
      * https://developer.samsung.com/wallet/addtosamsungwallet/walletcards/boardingpass.html
      */
     public static String toBoardingPassPayloadJson(BoardingPass bp) throws JsonProcessingException {
+        ObjectNode root = MAPPER.createObjectNode();
         ObjectNode card = MAPPER.createObjectNode();
+        root.set("card", card);
         card.put("type", "boardingpass");
         card.put("subType", "airlines");
 
@@ -192,7 +210,7 @@ public final class CardPayloadBuilder {
         item.set("attributes", attrs);
         data.add(item);
         card.set("data", data);
-        return MAPPER.writeValueAsString(card);
+        return MAPPER.writeValueAsString(root);
     }
 
     /**
@@ -200,7 +218,9 @@ public final class CardPayloadBuilder {
      * https://developer.samsung.com/wallet/addtosamsungwallet/walletcards/coupon.html
      */
     public static String toCouponPayloadJson(Coupon c) throws JsonProcessingException {
+        ObjectNode root = MAPPER.createObjectNode();
         ObjectNode card = MAPPER.createObjectNode();
+        root.set("card", card);
         card.put("type", "coupon");
         card.put("subType", "others");
 
@@ -223,6 +243,7 @@ public final class CardPayloadBuilder {
         attrs.put("appLinkLogo", DEMO_APP_LINK_LOGO);
         attrs.put("appLinkName", truncate(DEFAULT_APP_LINK_NAME, 32));
         attrs.put("appLinkData", truncate(DEFAULT_APP_LINK_DATA, 256));
+        attrs.put("preventCaptureYn", "N");
         if (c.getBrandName() != null && !c.getBrandName().isBlank()) {
             attrs.put("brandName", truncate(c.getBrandName(), 32));
         }
@@ -231,7 +252,7 @@ public final class CardPayloadBuilder {
         item.set("attributes", attrs);
         data.add(item);
         card.set("data", data);
-        return MAPPER.writeValueAsString(card);
+        return MAPPER.writeValueAsString(root);
     }
 
     /**
@@ -239,7 +260,9 @@ public final class CardPayloadBuilder {
      * https://developer.samsung.com/wallet/addtosamsungwallet/walletcards/digitalids.html
      */
     public static String toIdCardPayloadJson(IdCard id) throws JsonProcessingException {
+        ObjectNode root = MAPPER.createObjectNode();
         ObjectNode card = MAPPER.createObjectNode();
+        root.set("card", card);
         card.put("type", "idcard");
         card.put("subType", "employees");
 
@@ -285,7 +308,7 @@ public final class CardPayloadBuilder {
         item.set("attributes", attrs);
         data.add(item);
         card.set("data", data);
-        return MAPPER.writeValueAsString(card);
+        return MAPPER.writeValueAsString(root);
     }
 
     /** Sets barcode.value, barcode.serialType, barcode.ptFormat, barcode.ptSubFormat on attrs (Samsung sample). */

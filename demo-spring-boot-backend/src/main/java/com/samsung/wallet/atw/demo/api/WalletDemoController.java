@@ -63,7 +63,7 @@ public class WalletDemoController {
         this.notificationClient = notificationClient;
     }
 
-    @GetMapping("/")
+    @GetMapping({ "", "/" })
     public String index(Model model) {
         model.addAttribute("tickets", ticketService.findAll());
         model.addAttribute("boardingPasses", boardingPassService.findAll());
